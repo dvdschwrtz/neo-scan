@@ -2,6 +2,7 @@ defmodule NeoscanWeb.Application do
   @moduledoc false
   use Application
   alias NeoscanWeb.Endpoint
+  alias NeoscanWeb.RoomChannel
 
   def start(_type, _args) do
     import Supervisor.Spec
@@ -13,6 +14,7 @@ defmodule NeoscanWeb.Application do
       # Start your own worker by calling:
       # NeoscanWeb.Worker.start_link(arg1, arg2, arg3)
       # worker(NeoscanWeb.Worker, [arg1, arg2, arg3]),
+      worker(NeoscanMonitor.Server, [&RoomChannel.broadcast_change/1]),
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

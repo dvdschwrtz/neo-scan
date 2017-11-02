@@ -7,25 +7,28 @@ defmodule NeoscanMonitor.Server do
   """
 
   use GenServer
-  alias NeoscanWeb.RoomChannel
   alias Neoscan.ChainAssets
 
-  def start_link do
-    GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+  def start_link(callback) do
+    GenServer.start_link(__MODULE__, callback, name: __MODULE__)
   end
 
-  def init(:ok) do
-    {:ok, []}
+  def init(callback) do
+    IO.puts "callback"
+    IO.inspect callback
+    {:ok, %{ "callback" => callback }}
   end
 
-  def handle_info({:state_update, new_state}, _state) do
+  def handle_info({:state_update, new_state}, state) do
+    new_state_with_callback = Map.put(new_state, "callback", state.callback)
     schedule_work()
-    {:noreply, new_state}
+    {:noreply, new_state_with_callback}
   end
 
   def handle_info(:broadcast, state) do
     schedule_work() # Reschedule once more
-    RoomChannel.broadcast_change(state)
+    data = Map.delete(state, "callback")
+    state.callback(data)
     {:noreply, state}
   end
 
