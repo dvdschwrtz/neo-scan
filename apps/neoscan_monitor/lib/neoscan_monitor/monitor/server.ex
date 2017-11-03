@@ -28,7 +28,7 @@ defmodule NeoscanMonitor.Server do
   def handle_info(:broadcast, state) do
     schedule_work() # Reschedule once more
     data = Map.delete(state, "callback")
-    state.callback(data)
+    state.callback.(data)
     {:noreply, state}
   end
 
